@@ -3,6 +3,7 @@ package com.tongzhu.kittypay.orchestrator.outbox;
 
 
 
+import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 
 @Service
 
@@ -37,11 +39,17 @@ public class OutboxPublisher {
         outbox.setAcked(false);
         outbox.setReturned(false);
         outbox.setLastTouchedAt(Instant.now());
+        outbox.setTryCount(outbox.getTryCount() + 1);
 
         rabbitTemplate.convertAndSend(
                 "",                 // 默认交换机
                 "request_queue",        // 队列名 == routingKey
                 outbox.getPayload(),            // payload;
+                msg -> {
+                    msg.getMessageProperties()
+                            .setDeliveryMode(MessageDeliveryMode.PERSISTENT);
+                    return msg;
+                },
                 new CorrelationData(outbox.getUuid())           // confirm 回调用这个
         );
 
@@ -52,7 +60,8 @@ public class OutboxPublisher {
 
     @Scheduled(fixedDelay = 1000)
     public void sweeper() {
-        outboxRepository.deleteFive();
+
+        outboxRepository.deleteAll(outboxRepository.selectFiveToDelete());
     }
 
 

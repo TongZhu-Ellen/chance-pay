@@ -31,6 +31,12 @@ public class Outbox {
 
 
 
+    @Column(nullable = false)
+    private int tryCount = 0;
+
+
+
+
 
 
 
@@ -97,6 +103,17 @@ public class Outbox {
     public void setReturned(boolean returned) {
         this.returned = returned;
     }
+
+
+    public int getTryCount() {
+        return tryCount;
+    }
+
+    public void setTryCount(int tryCount) {
+        this.tryCount = tryCount;
+    }
+
+
 
     
 

@@ -13,9 +13,11 @@ import java.util.List;
 @Repository
 public interface OutboxRepository extends JpaRepository<Outbox, String> {
 
+
     @Query(value = """ 
             SELECT * FROM outbox
-            WHERE acked = false OR returned = true
+            WHERE try_count < 5 
+              AND (acked = false OR returned = true)
             ORDER BY last_touched_at ASC 
             LIMIT 1
             """, nativeQuery = true)
@@ -23,15 +25,14 @@ public interface OutboxRepository extends JpaRepository<Outbox, String> {
     public Outbox selectOneToPost();
 
 
-    @Modifying
     @Query(value = """
-            DELETE FROM outbox
-            WHERE acked = true AND returned = false 
-            AND last_touched_at <= NOW() - INTERVAL 2 SECOND
-            ORDER BY last_touched_at ASC
-            LIMIT 5
-            """, nativeQuery = true)
-    public int deleteFive();
+        SELECT * FROM outbox
+        WHERE (acked = true AND returned = false)
+          AND last_touched_at <= NOW() - INTERVAL 5 SECOND
+        ORDER BY last_touched_at ASC
+        LIMIT 5
+        """, nativeQuery = true)
+    List<Outbox> selectFiveToDelete();
 
 
     @Modifying
