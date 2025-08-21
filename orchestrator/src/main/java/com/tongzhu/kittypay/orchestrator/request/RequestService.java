@@ -36,8 +36,7 @@ public class RequestService {
         request = requestRepository.save(request);
         outbox = outboxRepository.save(outbox);
 
-        outboxRepository.touchOnce(uuid);
-        outboxPublisher.publish(new OutboxOutputDTO(uuid, payload));
+        
 
         return request;
     }

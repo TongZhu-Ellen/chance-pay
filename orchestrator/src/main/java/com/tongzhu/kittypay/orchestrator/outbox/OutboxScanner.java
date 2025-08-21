@@ -23,7 +23,7 @@ public class OutboxScanner {
 
 
 
-    @Scheduled(fixedDelay = 200)
+    @Scheduled(fixedDelay = 1000)
     public void scanEvery200ms() {
 
         scannerPublish(scannerTouch());
