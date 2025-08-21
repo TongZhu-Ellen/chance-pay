@@ -21,7 +21,7 @@ public class OutboxPublisher {
     public OutboxPublisher(RabbitTemplate rabbitTemplate, OutboxRepository outboxRepository) {
         this.rabbitTemplate = rabbitTemplate;
         this.outboxRepository = outboxRepository;
-        rabbitTemplate.setMandatory(true);
+
     }
 
 
