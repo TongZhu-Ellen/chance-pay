@@ -32,11 +32,15 @@ public class InboxListener {
         String cusId = JsonConverter.extractCusId(payload);
         BigDecimal amount = JsonConverter.extractAmount(payload);
 
-        if (inboxRepository.insertIgnore(uuid) == 0) return;
 
-        boolean deductionSucceed = walletRepository.tryDeduct(cusId, amount) == 1;
+        boolean existed = inboxRepository.insertIgnore(uuid) == 0;
 
-        inboxRepository.findById(uuid).get().setStatus(deductionSucceed ? Status.SUCCEED : Status.FAILED);
+        if (existed) return;
+
+        boolean deducted = walletRepository.deduct(cusId, amount) == 1;
+
+        inboxRepository.findById(uuid).get().setStatus(deducted ? Status.SUCCEED : Status.FAILED);
+
 
 
 
