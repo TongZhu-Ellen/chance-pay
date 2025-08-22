@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static org.springframework.transaction.annotation.Propagation.REQUIRES_NEW;
+
 
 @Repository
 public interface OutboxRepository extends JpaRepository<Outbox, String> {

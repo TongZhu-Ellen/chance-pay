@@ -7,7 +7,7 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+
 
 @Component
 @DependsOn("rabbitAdmin")
@@ -16,7 +16,7 @@ public class OutboxPublisher {
     private final RabbitTemplate rabbitTemplate;
     private final OutboxRepository outboxRepository;
 
-    private static final Logger log = LoggerFactory.getLogger(OutboxPublisher.class);
+
 
     public OutboxPublisher(RabbitTemplate rabbitTemplate, OutboxRepository outboxRepository) {
         this.rabbitTemplate = rabbitTemplate;

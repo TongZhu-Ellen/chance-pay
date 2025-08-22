@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfig {
 
 
-    public static final String QUEUE_NAME = "request_queue";
+    public static final String QUEUE_NAME = "kitty_queue";
 
     @Bean
     public Queue setQueue() {

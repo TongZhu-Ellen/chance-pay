@@ -1,6 +1,8 @@
 package com.tongzhu.kittypay.orchestrator.request;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
@@ -17,6 +19,8 @@ public class Request {
     private String cusId;
     private BigDecimal amount;
     private Instant createdAt;
+
+    @Enumerated(EnumType.STRING)
     private RequestStatus status;
 
 

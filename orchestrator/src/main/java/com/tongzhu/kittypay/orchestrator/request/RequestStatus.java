@@ -4,5 +4,5 @@ public enum RequestStatus {
     PENDING,
     SUCCEED,
     FAILED,
-    EXPIRED;
+    TIME_OUT;
 }
