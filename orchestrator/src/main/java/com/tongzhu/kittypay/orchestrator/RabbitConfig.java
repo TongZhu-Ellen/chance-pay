@@ -1,12 +1,12 @@
 package com.tongzhu.kittypay.orchestrator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.amqp.core.MessageDeliveryMode;
-import org.springframework.amqp.core.Queue;
+
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.MessageConverter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,20 +14,15 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitConfig {
 
 
-    public static final String QUEUE_NAME = "kitty_queue";
 
-    @Bean
-    public Queue setQueue() {
-        return new Queue(QUEUE_NAME, true);
-    }
+
 
     @Bean
     public CachingConnectionFactory setConnectionFactory() {
         CachingConnectionFactory ccf = new CachingConnectionFactory();
 
         ccf.setPublisherConfirmType(CachingConnectionFactory.ConfirmType.CORRELATED);
-        ccf.setPublisherReturns(true);
-        ccf.setChannelCacheSize(1);
+
 
         return ccf;
 
@@ -46,7 +41,7 @@ public class RabbitConfig {
             return message;
         });
 
-        rabbitTemplate.setMandatory(true);
+
 
         return rabbitTemplate;
     }

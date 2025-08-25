@@ -2,10 +2,10 @@ package com.tongzhu.kittypay.orchestrator.request;
 
 import com.tongzhu.kittypay.orchestrator.JsonConverter;
 import com.tongzhu.kittypay.orchestrator.outbox.Outbox;
-import com.tongzhu.kittypay.orchestrator.outbox.OutboxOutputDTO;
 import com.tongzhu.kittypay.orchestrator.outbox.OutboxPublisher;
 import com.tongzhu.kittypay.orchestrator.outbox.OutboxRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -15,14 +15,15 @@ public class RequestService {
 
     private final RequestRepository requestRepository;
     private final OutboxRepository outboxRepository;
-    private final OutboxPublisher outboxPublisher;
 
-    public RequestService(RequestRepository requestRepository, OutboxRepository outboxRepository, OutboxPublisher outboxPublisher) {
+
+    public RequestService(RequestRepository requestRepository, OutboxRepository outboxRepository) {
         this.requestRepository = requestRepository;
         this.outboxRepository = outboxRepository;
-        this.outboxPublisher = outboxPublisher;
+
     }
 
+    @Transactional
     public Request postPaymentRequest(String uuid, RequestInputDTO requestInputDTO) {
 
         String cusId = requestInputDTO.cusId();

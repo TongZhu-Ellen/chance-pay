@@ -30,7 +30,7 @@ public interface OutboxRepository extends JpaRepository<Outbox, String> {
 
     @Query(value = """
             SELECT * FROM outbox
-            WHERE try_count < 5 AND last_touched_at < (CURRENT_TIMESTAMP - INTERVAL 5 SECOND)
+            WHERE try_count < 5 AND last_touched_at < (CURRENT_TIMESTAMP - INTERVAL 2 SECOND)
             ORDER BY last_touched_at ASC
             LIMIT 5
             FOR UPDATE SKIP LOCKED
