@@ -1,4 +1,4 @@
-# Consistency Guarantees (Ver.1.0 — FatePay)
+# Consistency Guarantees (Ver.1.0 — ChancePay)
 
 This project follows an **outbox/inbox pattern** to approximate eventual consistency between the **orchestrator (request)** and the **wallet**.  
 The guarantees below strictly match the current implementation.
@@ -23,14 +23,14 @@ The guarantees below strictly match the current implementation.
 - The wallet consumer wraps message handling in a try–catch block.  
 - Any unhandled exception is swallowed, so the listener still returns normally and the broker sends an ACK.  
 - This means a message is **never redelivered** (“at most once”): either the inbox + deduct succeed, or the message vanishes with an error log.  
-- This design reflects the *FatePay* philosophy: the wallet tries, but failure leaves only traces in logs, not repeated cooking of the same message.
+- This design reflects the *ChancePay* philosophy: the wallet tries, but failure leaves only traces in logs, not repeated cooking of the same message.
 
 ---
 
 ### 4. If inbox insert + deduct succeed, request is notified (best effort)
 - After updating inbox status (SUCCEED/FAILED), the listener attempts an HTTP `PUT /internal/requests/{uuid}` to update the request side.  
 - This call is wrapped in `try–catch`. If it fails, wallet logs a warning and does not retry.  
-- This reflects the *FatePay* spirit: notification is attempted, but not guaranteed.
+- This reflects the *ChancePay* spirit: notification is attempted, but not guaranteed.
 
 ---
 
@@ -50,3 +50,4 @@ The guarantees below strictly match the current implementation.
 - Logging is currently marked as TODO; future versions will log each case explicitly.
 
 ---
+
