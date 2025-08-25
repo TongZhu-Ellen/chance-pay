@@ -15,13 +15,13 @@ public class JsonConverter {
 
 
     public static String toPayload(String uuid,
-                         String cusID,
+                         String cusId,
                          BigDecimal amount) {
         try {
 
             return objectMapper.writeValueAsString(
                     Map.of("uuid", uuid,
-                            "customerId", cusID,
+                            "cusId", cusId,
                             "amount", amount)
 
 
