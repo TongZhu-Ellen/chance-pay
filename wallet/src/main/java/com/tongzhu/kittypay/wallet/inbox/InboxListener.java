@@ -1,7 +1,7 @@
 package com.tongzhu.kittypay.wallet.inbox;
 
 import com.tongzhu.kittypay.wallet.JsonConverter;
-import com.tongzhu.kittypay.wallet.Status;
+
 import com.tongzhu.kittypay.wallet.wallet.WalletRepository;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -39,7 +39,7 @@ public class InboxListener {
 
         boolean deducted = walletRepository.deduct(cusId, amount) == 1;
 
-        inboxRepository.findById(uuid).get().setStatus(deducted ? Status.SUCCEED : Status.FAILED);
+        inboxRepository.updateStatus(uuid, deducted ? "SUCCEED" : "FAILED");
 
 
 

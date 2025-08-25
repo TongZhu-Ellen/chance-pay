@@ -1,6 +1,6 @@
 package com.tongzhu.kittypay.wallet.inbox;
 
-import com.tongzhu.kittypay.wallet.Status;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +17,12 @@ public interface InboxRepository extends JpaRepository<Inbox, String> {
             INSERT IGNORE INTO inbox(uuid, status) VALUES (:uuid, 'PENDING');
             """, nativeQuery = true)
     public int insertIgnore(@Param("uuid") String uuid);
+
+
+    @Modifying
+    @Query(value = "UPDATE inbox SET status = :status WHERE uuid = :uuid", nativeQuery = true)
+    int updateStatus(@Param("uuid") String uuid, @Param("status") String status);
+
 
 
 }
