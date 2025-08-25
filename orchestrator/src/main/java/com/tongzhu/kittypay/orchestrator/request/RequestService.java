@@ -41,4 +41,14 @@ public class RequestService {
 
         return request;
     }
+
+    @Transactional
+    public int setSucceedOrFailed(String uuid, boolean succeed) {
+        if (succeed) return requestRepository.setSucceed(uuid);
+        else return requestRepository.setFailed(uuid);
+    }
+
+
+
+
 }
