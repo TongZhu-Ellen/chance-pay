@@ -9,9 +9,14 @@ import java.math.BigDecimal;
 @Entity
 public class Wallet {
 
+
+
     @Id
     private String cusId;
     private BigDecimal balance;
+
+
+
 
 
 
@@ -24,5 +29,19 @@ public class Wallet {
     public BigDecimal deduct(BigDecimal amount) {
         this.balance = this.balance.subtract(amount);
         return this.balance;
+    }
+
+
+
+
+
+
+
+
+    public String getCusId() {
+        return cusId;
+    }
+    public BigDecimal getBalance() {
+        return balance;
     }
 }

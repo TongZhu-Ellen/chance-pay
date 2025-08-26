@@ -3,6 +3,7 @@ package com.tongzhu.chancepay.orchestrator.request;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -23,6 +24,17 @@ public class RequestController {
         Request request = requestService.postPaymentRequest(uuid, requestInputDTO);
 
         return ResponseEntity.ok(request);
+
+    }
+
+    @GetMapping("/payments/{uuid}")
+    public ResponseEntity<Request> getPaymentRequest(@PathVariable String uuid) {
+        Optional<Request> optionalRequest = requestService.getPaymentRequest(uuid);
+
+        return requestService.getPaymentRequest(uuid)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+
 
     }
 

@@ -16,16 +16,11 @@ public class InboxListener {
 
     static final String QUEUE_NAME = "chance_queue";
 
-    private final RestTemplate restTemplate= new RestTemplate();
+    private final InboxService inboxService;
 
-    private final InboxRepository inboxRepository;
-    private final WalletRepository walletRepository;
-
-    public InboxListener(InboxRepository inboxRepository, WalletRepository walletRepository) {
-        this.inboxRepository = inboxRepository;
-        this.walletRepository = walletRepository;
+    public InboxListener(InboxService inboxService) {
+        this.inboxService = inboxService;
     }
-
 
 
     @RabbitListener(queues = QUEUE_NAME)
@@ -33,7 +28,7 @@ public class InboxListener {
 
 
         try {
-            helpListen(payload);
+            inboxService.process(payload);
         } catch (Exception e) {
 
             // TODO: log.error() about not being able to conduct payment here!
@@ -48,28 +43,5 @@ public class InboxListener {
 
 
 
-    @Transactional
-    public void helpListen(String payload) {
-        String uuid = JsonConverter.extractUuid(payload);
-        String cusId = JsonConverter.extractCusId(payload);
-        BigDecimal amount = JsonConverter.extractAmount(payload);
 
-
-        boolean existed = inboxRepository.insertIgnore(uuid) == 0;
-
-        if (existed) return;
-
-        boolean deducted = walletRepository.deduct(cusId, amount) == 1;
-
-        inboxRepository.updateStatus(uuid, deducted ? "SUCCEED" : "FAILED");
-
-        try {
-            restTemplate.put(
-                    "http://orchestrator:8080/internal/requests/" + uuid,
-                    deducted);
-        } catch (Exception e) {
-            // TODO: log.warn() to warn about failed HTTP-req;
-        }
-
-    }
 }

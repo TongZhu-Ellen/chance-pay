@@ -33,12 +33,28 @@ public class Outbox {
 
 
 
-    public String getUuid() {
-        return uuid;
-    }
+
+
+
+
+
+
     public String getPayload() {
         return payload;
     }
+    public String getUuid() {
+        return uuid;
+    }
+    public Instant getLastTouchedAt() {
+        return lastTouchedAt;
+    }
+    public int getTryCount() {
+        return tryCount;
+    }
+
+
+
+
 
 
 }

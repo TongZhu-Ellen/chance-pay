@@ -3,7 +3,8 @@ package com.tongzhu.chancepay.orchestrator.request;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.Id;
+
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -25,6 +26,11 @@ public class Request {
 
 
 
+
+
+
+
+
     public Request() {
     }
     public Request(String uuid, String cusId, BigDecimal amount, Instant createdAt) {
@@ -34,6 +40,38 @@ public class Request {
         this.createdAt = createdAt;
         this.status = RequestStatus.PENDING;
     }
+
+
+
+
+
+
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+    public String getUuid() {
+        return uuid;
+    }
+    public String getCusId() {
+        return cusId;
+    }
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+    public RequestStatus getStatus() {
+        return status;
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 }

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Optional;
 
 @Service
 public class RequestService {
@@ -41,11 +42,17 @@ public class RequestService {
         return request;
     }
 
+    public Optional<Request> getPaymentRequest(String uuid) {
+        return requestRepository.findById(uuid);
+    }
+
     @Transactional
     public int setSucceedOrFailed(String uuid, boolean succeed) {
         if (succeed) return requestRepository.setSucceed(uuid);
         else return requestRepository.setFailed(uuid);
     }
+
+
 
 
 
