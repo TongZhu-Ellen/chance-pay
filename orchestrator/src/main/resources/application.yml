@@ -1,0 +1,30 @@
+spring:
+
+
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+    publisher-confirm-type: correlated
+    template.delivery-mode: persistent
+
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/chance_pay_orchestrator_db?useSSL=false&serverTimezone=UTC
+    username: root
+    password: 66666666
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+
+
+server:
+  port: 8080
+
+
