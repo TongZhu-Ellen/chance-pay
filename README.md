@@ -1,5 +1,14 @@
 
 
+## Glossary
+
+### Orchestrator side
+- **request** – source of truth (`uuid`, `cusId`, `amount`, `status`). Always exists.  
+- **outbox** – message buffer, deleted after successful MQ ack.  
+
+### Wallet side
+- **wallet** – customer ledger (`cusId`, `balance`).  
+- **inbox** – processing tracker (`uuid`, `status`: `PENDING` / `FAILED` / `SUCCEED`).  
 
 
 
@@ -15,11 +24,11 @@ uuid --> outbox
 
 ```
 
-- A record is inserted into the **Request** table.  
+- A record is inserted into the **request** table.  
   - This record will always exist.  
   - Its status may remain `PENDING` indefinitely, but it will not disappear.  
 
-- A record is inserted into the **Outbox** table.
+- A record is inserted into the **outbox** table.
 
 
 
@@ -49,7 +58,7 @@ MQ -.-> Listener
 
 
 The **Outbox Scanner** periodically scans for pending records and attempts to publish them to the MQ. At this stage, the system guarantees that one of the following conditions will hold: 
-1. The record remains in the **Outbox** and failures are logged with the tag `[FAILED TO SEND TO MQ]`.
+1. The record remains in the **outbox** and failures are logged with the tag `[FAILED TO SEND TO MQ]`.
    - All retry attempts (up to a fixed limit) have failed.
 2. The message is still in the **MQ**.
 3. The message has been consumed at least once by the **Wallet** service.
@@ -123,7 +132,7 @@ inbox -.-> request
 ```
 
 
-The **Wallet** side attempts to callback the **Orchestrator** to update the request status.  
+The **Wallet** side attempts to callback the **Orchestrator** side to update the request status.  
 At this stage, the outcomes are:
 
 | Case (remarks)                       | Request table status | Log emitted |
