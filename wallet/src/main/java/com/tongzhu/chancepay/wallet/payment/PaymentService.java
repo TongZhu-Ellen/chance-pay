@@ -34,7 +34,7 @@ public class PaymentService {
 
 
     @Transactional
-    public boolean process(String uuid, String cusId, BigDecimal amount) {
+    public Boolean process(String uuid, String cusId, BigDecimal amount) {
 
 
 
@@ -43,13 +43,13 @@ public class PaymentService {
 
         boolean existed = inboxRepository.insertIgnore(uuid) == 0;
 
-        if (existed) return false;
+        if (existed) return null; // duplicate, already processed
 
         boolean deducted = walletRepository.tryDeduct(cusId, amount) == 1;
 
         inboxRepository.updateStatus(uuid, deducted ? "SUCCEED" : "FAILED");
 
-        return deducted;
+        return deducted; // true or false
 
     }
 }

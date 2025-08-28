@@ -1,6 +1,8 @@
 package com.tongzhu.chancepay.orchestrator.outbox;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
@@ -9,7 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class OutboxPublisher {
 
-    public static final String QUEUE_NAME = "chance_queue";
+    private static final String QUEUE_NAME = "chance_queue";
+
+    private static final Logger log = LoggerFactory.getLogger(OutboxPublisher.class);
 
 
 
@@ -48,7 +52,11 @@ public class OutboxPublisher {
             if (ex == null && confirm.isAck()) {
                 outboxRepository.deleteById(uuid);
             } else {
-                // TODO: log.warn;
+                log.error("[FILED TO SEND TO MQ] | uuid: {}, isAcked: {}, reason:{} ",
+                        uuid,
+                        confirm != null ? confirm.isAck() : null,
+                        confirm != null ? confirm.getReason(): null,
+                        ex);
             }
         });
 

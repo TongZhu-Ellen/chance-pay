@@ -26,7 +26,7 @@ public class RequestController {
 
         requestService.postRequest(uuid, paymentInputDto);
 
-        return ResponseEntity.accepted().body(uuid);
+        return ResponseEntity.ok(uuid);
 
     }
 
