@@ -1,53 +1,164 @@
-# Consistency Guarantees (Ver.1.0 — ChancePay)
 
-This project follows an **outbox/inbox pattern** to approximate eventual consistency between the **orchestrator (request)** and the **wallet**.  
-The guarantees below strictly match the current implementation.
+
+
+
+
+
+
+## Phase 1
+
+```mermaid
+graph LR
+cusInput[cusId + amount] --> uuid
+uuid --> request
+uuid --> outbox
+
+```
+
+- A record is inserted into the **Request** table.  
+  - This record will always exist.  
+  - Its status may remain `PENDING` indefinitely, but it will not disappear.  
+
+- A record is inserted into the **Outbox** table.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Phase 2 
+
+```mermaid
+graph LR
+
+uuid --> request
+uuid --> outbox
+outbox -.-> MQ
+MQ -.-> Listener
+
+```
+
+
+The **Outbox Scanner** periodically scans for pending records and attempts to publish them to the MQ. At this stage, the system guarantees that one of the following conditions will hold: 
+1. The record remains in the **Outbox** and failures are logged with the tag `[FAILED TO SEND TO MQ]`.
+   - All retry attempts (up to a fixed limit) have failed.
+2. The message is still in the **MQ**.
+3. The message has been consumed at least once by the **Wallet** service.
+
+
+
 
 ---
 
-### 1. Request is always recorded
-- Once a client initiates a payment, a `Request` record is created, and an `Outbox` record is inserted in the same transaction.  
-- As long as you hold the `uuid`, there is always at least a `Request`.  
-- If the message has never been successfully published to MQ, the `Outbox` still retains the order.
+⚠ **Error handling**  
+If a synchronous error occurs during publishing (e.g. MQ connection failure), the program will throw an exception and stop, rather than silently retry.  
+This design choice highlights infrastructure-level issues immediately and prevents silent backlog growth in the outbox table.  
+Future improvements may include automated alerting to handle such errors without manual intervention.   
 
----
 
-### 2. Message publication is retried but bounded
-- The outbox scanner retries publishing up to 5 times (`try_count < 5`).  
-- If all 5 attempts fail, the message remains in the outbox. This is treated as a terminal PENDING case.  
-- (DLQ and extended retry policy are left as TODO.)
 
----
 
-### 3. Listener processes once, success or fail
-- The wallet consumer wraps message handling in a try–catch block.  
-- Any unhandled exception is swallowed, so the listener still returns normally and the broker sends an ACK.  
-- This means a message is **never redelivered** (“at most once”): either the inbox + deduct succeed, or the message vanishes with an error log.  
-- This design reflects the *ChancePay* philosophy: the wallet tries, but failure leaves only traces in logs, not repeated cooking of the same message.
 
----
 
-### 4. If inbox insert + deduct succeed, request is notified (best effort)
-- After updating inbox status (SUCCEED/FAILED), the listener attempts an HTTP `PUT /internal/requests/{uuid}` to update the request side.  
-- This call is wrapped in `try–catch`. If it fails, wallet logs a warning and does not retry.  
-- This reflects the *ChancePay* spirit: notification is attempted, but not guaranteed.
 
----
 
-### 5. Idempotent consumption ensures no double deduct
-- Inbox uses `INSERT IGNORE` with a unique key on `uuid`.  
-- If a message is replayed, the insert returns 0 and the listener returns immediately.  
-- This guarantees one payment is never deducted twice.
 
----
 
-### 6. Request side may remain PENDING forever
-- Reasons include:  
-  - Outbox never successfully published (after 5 attempts).  
-  - Wallet consumer failed and swallowed exception.  
-  - Wallet succeeded but failed to notify orchestrator.  
-- In all cases, the request remains visible as `PENDING` until resolved by manual reconciliation.  
-- Logging is currently marked as TODO; future versions will log each case explicitly.
 
----
+
+
+
+
+
+
+
+## Phase 3
+
+```mermaid
+graph LR
+
+Listener -.-> inbox
+
+inbox -.-> inbox
+
+
+```
+
+
+
+**Wallet** processes messages from the MQ with at-least-once semantics.  
+On each delivered message, one of the following outcomes will hold:
+
+| Case | Inbox state | Log emitted |
+|------|-------------|-------------|
+| Payload cannot be parsed | No record | ` [FAILED TO READ FROM PAYLOAD]` |
+| Deduction program failed to complete | Record exists with **PENDING** status | ` [FAILED TO DEDUCT FROM WALLET]` |
+| Deduction process completed| Record finalized as **FAILED** or **SUCCEED** | *(no `FAILED TO ...` log)* |
+
+
+
+
+
+
+
+
+## Phase 4
+
+
+```mermaid
+graph LR
+
+inbox -.-> request  
+
+
+```
+
+
+The **Wallet** side attempts to callback the **Orchestrator** to update the request status.  
+At this stage, the outcomes are:
+
+| Case (remarks)                       | Request table status | Log emitted |
+|--------------------------------------|----------------------|-------------|
+| Callback failed (HTTP error/timeout) | **PENDING**          | ` [FAILED TO CALLBACK FROM WALLET]` |
+| Callback succeeded                   | **FAILED** or **SUCCEED** | *(no `FAILED TO ...` log)* |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
