@@ -109,7 +109,7 @@ On each delivered message, one of the following outcomes will hold:
 
 | Case | Inbox state | Log emitted |
 |------|-------------|-------------|
-| Payload cannot be parsed | No record | ` [FAILED TO READ FROM PAYLOAD]` |
+| Payload cannot be parsed | No record | ` [PAYLOAD_CORRUPTION_ALERT]` |
 | Deduction program failed to complete | Record exists with **PENDING** status | ` [FAILED TO DEDUCT FROM WALLET]` |
 | Deduction process completed| Record finalized as **FAILED** or **SUCCEED** | *(no `FAILED TO ...` log)* |
 
