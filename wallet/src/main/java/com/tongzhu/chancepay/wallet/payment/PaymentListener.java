@@ -57,8 +57,8 @@ public class PaymentListener {
             cusId = JsonConverter.extractCusId(payload);
             amount = JsonConverter.extractAmount(payload);
 
-        } catch (Exception payloadReadingExp) {
-            log.error("[FAILED TO READ FROM PAYLOAD] | payload: {}", payload, payloadReadingExp);
+        } catch (Exception payloadParsingExp) {
+            log.error("[PAYLOAD CORRUPTION ALERT] | payload: {}", payload, payloadParsingExp);
             return;
         }
 
