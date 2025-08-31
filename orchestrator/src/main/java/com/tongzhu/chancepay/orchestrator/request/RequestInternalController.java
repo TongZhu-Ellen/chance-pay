@@ -24,7 +24,7 @@ public class RequestInternalController {
        boolean set = requestService.setSucceedOrFailed(uuid, succeed) == 1;
 
        if (!set) {
-           log.error("[BUSINESS_DIVERGENCE_ALERT] | request {} does not exists or not PENDING", uuid);
+           log.error("[BUSINESS_DIVERGENCE_ALERT] | request {} does not exists or not currently PENDING", uuid);
        }
 
        return ResponseEntity.accepted().build();
