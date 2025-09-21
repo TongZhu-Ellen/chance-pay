@@ -20,8 +20,8 @@ public class Request {
     private BigDecimal amount;
     private Instant createdAt;
 
-    @Enumerated(EnumType.STRING)
-    private RequestStatus status;
+
+    private Boolean succeed;
 
 
 
@@ -37,7 +37,7 @@ public class Request {
         this.cusId = cusId;
         this.amount = amount;
         this.createdAt = createdAt;
-        this.status = RequestStatus.PENDING;
+
     }
 
 
@@ -58,8 +58,8 @@ public class Request {
     public Instant getCreatedAt() {
         return createdAt;
     }
-    public RequestStatus getStatus() {
-        return status;
+    public Boolean getSucceed() {
+        return succeed;
     }
 
 

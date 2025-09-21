@@ -14,16 +14,10 @@ public interface RequestRepository extends JpaRepository<Request, String> {
     @Modifying
     @Query(value = """
             UPDATE request
-            SET status = 'SUCCEED'
-            WHERE uuid = :uuid AND status = 'PENDING'
+            SET succeed = :succeed
+            WHERE uuid = :uuid AND succeed IS NULL
             """, nativeQuery = true)
-    public int setSucceed(@Param("uuid") String uuid);
+    public int setSucceed(@Param("uuid") String uuid, @Param("succeed") Boolean succeed);
 
-    @Modifying
-    @Query(value = """
-            UPDATE request
-            SET status = 'FAILED'
-            WHERE uuid = :uuid AND status = 'PENDING'
-            """, nativeQuery = true)
-    public int setFailed(@Param("uuid") String uuid);
+
 }

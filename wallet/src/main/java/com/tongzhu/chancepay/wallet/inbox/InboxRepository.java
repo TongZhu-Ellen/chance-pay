@@ -14,14 +14,18 @@ public interface InboxRepository extends JpaRepository<Inbox, String> {
 
     @Modifying
     @Query(value = """
-            INSERT IGNORE INTO inbox(uuid, status) VALUES (:uuid, 'PENDING');
+            INSERT IGNORE INTO inbox(uuid, succeed) VALUES (:uuid, NULL);
             """, nativeQuery = true)
     public int insertIgnore(@Param("uuid") String uuid);
 
 
     @Modifying
-    @Query(value = "UPDATE inbox SET status = :status WHERE uuid = :uuid", nativeQuery = true)
-    int updateStatus(@Param("uuid") String uuid, @Param("status") String status);
+    @Query(value = """
+            UPDATE inbox
+            SET succeed = :succeed 
+            WHERE uuid = :uuid && succeed IS NULL
+            """, nativeQuery = true)
+    int updateStatus(@Param("uuid") String uuid, @Param("succeed") Boolean succeed);
 
 
 

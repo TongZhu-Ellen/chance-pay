@@ -61,9 +61,8 @@ public class RequestService {
 
 
     @Transactional
-    public int setSucceedOrFailed(String uuid, boolean succeed) {
-        if (succeed) return requestRepository.setSucceed(uuid);
-        else return requestRepository.setFailed(uuid);
+    public int setSucceed(String uuid, boolean succeed) {
+        return requestRepository.setSucceed(uuid, succeed);
     }
 
 

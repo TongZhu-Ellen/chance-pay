@@ -11,22 +11,17 @@ public class Inbox {
 
     @Id
     private String uuid;
-    private String status;
-
-
-
-
-
-
+    private Boolean succeed;
 
 
 
     public String getUuid() {
         return uuid;
     }
-    public String getStatus() {
-        return status;
+    public Boolean getSucceed() {
+        return succeed;
     }
+
 
 
 

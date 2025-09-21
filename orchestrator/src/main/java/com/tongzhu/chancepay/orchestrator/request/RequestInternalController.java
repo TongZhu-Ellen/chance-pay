@@ -21,7 +21,7 @@ public class RequestInternalController {
     @PutMapping("/{uuid}")
     public ResponseEntity<Void> setSucceedOrFailed(@PathVariable String uuid, @RequestBody boolean succeed) {
 
-       boolean set = requestService.setSucceedOrFailed(uuid, succeed) == 1;
+       boolean set = requestService.setSucceed(uuid, succeed) == 1;
 
        if (!set) {
            log.error("[BUSINESS_DIVERGENCE_ALERT] | request {} does not exists or not currently PENDING", uuid);
