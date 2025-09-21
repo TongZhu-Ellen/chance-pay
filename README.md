@@ -1,4 +1,4 @@
-# ChancePay MVP
+# ChancePay MVP （中文：随缘付）
 
 ## Glossary
 
@@ -42,8 +42,8 @@ uuid --> outbox
 graph LR
 uuid --> request
 uuid --> outbox
-outbox -.-> MQ
-MQ -.-> Listener
+outbox -.-> mq[(Message Queue)]
+mq[(Message Queue)] -.-> Listener
 ```
 
 The **Outbox Scanner** periodically scans for pending records and attempts to publish them to the MQ. At this stage, the system guarantees that one of the following conditions will hold:  
@@ -84,24 +84,38 @@ At this stage, the “deduction” never fails mid-way, because it is only a coi
 
 ```mermaid
 graph LR
-inbox -.-> request  
+Listener --> inbox -.-> request  
 ```
 
 The **Wallet** side attempts to callback the **Orchestrator** side to update the request status.  
 At this stage, the outcomes are:
 
-| Case (remarks)                       | Request table `succeed` | Log emitted |
-|--------------------------------------|--------------------------|-------------|
-| Callback failed (HTTP error/timeout) | `NULL` (pending)         | `[FAILED TO CALLBACK FROM WALLET]` |
-| Callback succeeded                   | `FALSE` or `TRUE`        | *(no `FAILED TO ...` log)* |
+| Case (remarks)                       | Request table `succeed` | Log emitted | Notes |
+|--------------------------------------|--------------------------|-------------|-------|
+| Callback failed (HTTP error/timeout) | `NULL` (pending)         | `[FAILED TO CALLBACK FROM WALLET]` | In this case, the orchestrator keeps the request pending. Truth can still be recovered by inspecting **inbox** on the Wallet side (manual reconciliation). |
+| Callback succeeded                   | `FALSE` or `TRUE`        | *(no `FAILED TO ...` log)* | Request finalized automatically; no need to query inbox. |
+
+
+
+
 
 ---
 
 ## Design Rationale
 
-- **Boolean tri-state**: using `NULL` / `TRUE` / `FALSE` directly in DB makes pending explicit and minimal.  
-- **Pretend wallet**: the wallet no longer maintains a ledger; it only flips a coin.  
-  - This eliminates business logic failures in the wallet itself.  
-  - All uncertainty comes from orchestration and callback reliability.  
-- **Request–Response symmetry**: orchestrator’s `request` and wallet’s `inbox` mirror each other, just as `outbox` and MQ mirror each other.  
-- This makes the orchestrator the clear “protagonist” of the system, while wallet is deliberately reduced to an unreliable external stub.  
+
+
+- **Boolean tri-state**: store `succeed` as `NULL` / `TRUE` / `FALSE` to make **pending** explicit and minimal.  
+  - Enforce write-once finalization with `... AND succeed IS NULL`.
+ 
+- **Pretend wallet (coin flip)**: deliberately trivializes business logic to foreground **orchestration + eventual consistency**.  
+  - This project is about consistency mechanics, **not** showcasing fancy SQL/ledger design.
+
+- **Symmetry**: two mirrored pairs make the system easy to reason about.  
+  - **Outbox ↔ Inbox**: producer-side buffer vs. consumer-side idempotency guard.  
+  - **Request ↔ Response**: source-of-truth row vs. its finalization via callback (or later reconciliation).
+
+- **Linearity**: the pipeline is strictly forward-only.  
+  - If the process stops, it always stops at a **clear and observable** point.  
+  - If it advances, it moves **deterministically** to the next stage.  
+  - MVP avoids hidden branches/maze-style retries; the flow is simple, finite, and traceable（“随缘”）。
