@@ -62,16 +62,14 @@ public class PaymentListener {
             return;
         }
 
-        try {
-            deducted = paymentService.process(uuid, cusId, amount);
-        } catch (Exception paymentProcessingExp) {
-            log.warn("[FAILED TO DEDUCT FROM WALLET] | uuid: {}, cusId: {}, amount: {}",
-                    uuid, cusId, amount,
-                    paymentProcessingExp);
-            return;
-        }
 
-        if (deducted == null) return;
+        deducted = paymentService.pretendToProcess(uuid, cusId, amount);
+        if (deducted == null) return; // no need to callback!
+
+
+
+
+
 
         try {
             restTemplate.put(
