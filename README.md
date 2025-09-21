@@ -1,5 +1,6 @@
 # ChancePay MVP （中文：随缘付）
 
+
 ## Glossary
 
 ### Orchestrator side
@@ -118,4 +119,4 @@ At this stage, the outcomes are:
 - **Linearity**: the pipeline is strictly forward-only.  
   - If the process stops, it always stops at a **clear and observable** point.  
   - If it advances, it moves **deterministically** to the next stage.  
-  - MVP avoids hidden branches/maze-style retries; the flow is simple, finite, and traceable（“随缘”）。
+  - MVP avoids hidden branches/maze-style retries; the flow is simple, finite, and traceable — “随缘”.
