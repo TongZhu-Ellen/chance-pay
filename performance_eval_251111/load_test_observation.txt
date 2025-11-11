@@ -1,0 +1,21 @@
+### Load Test Observation
+
+- I ran the following command to stress-test the system’s weakest point in theory — the outbox-to-MQ handoff.
+
+hey -m POST -c 2 -z 30s -q 10 -d '{"cusId":"abc123","amount":10}' -H "Content-Type: application/json" http://localhost:8080/api/requests
+
+- and observed that under a 10 QPS load the system maintained a stable ability to clear the outbox.
+
+- The outbox count was polled using @Scheduled(fixedDelay = 200), i.e., 200 ms after each run completes (not wall-clock every 200 ms). The effective sampling interval is therefore 200 ms + task execution time, resulting in slightly non-uniform spacing. We recorded the pending count via jdbcTemplate.queryForObject("SELECT COUNT(*) FROM outbox", Integer.class).
+
+
+### 负载测试摘要
+
+- 我在理论上系统最薄弱的环节——outbox 到 MQ 的交接处——进行了压力测试，使用如下指令：
+
+hey -m POST -c 2 -z 30s -q 10 -d '{"cusId":"abc123","amount":10}' -H "Content-Type: application/json" http://localhost:8080/api/requests
+
+- 在 10 QPS 的负载下，系统表现出稳定清空 outbox 的能力。
+
+- 通过 @Scheduled(fixedDelay = 200) 以“间隔 200ms”的方式轮询 outbox：每次采样完成后再等待 200ms 启动下一次。因此实际采样间隔为 200ms + 采样代码执行时间，间隔略有波动。采样时使用jdbcTemplate.queryForObject("SELECT COUNT(*) FROM outbox", Integer.class)
+读取 outbox 中的 pending 条目数。

@@ -25,6 +25,8 @@ public class OutboxService {
     public List<Outbox> selectTouched(int outboxPerSelect, int backoffInSecond) {
         List<Outbox> batch = outboxRepository.selectBatch(outboxPerSelect, backoffInSecond);
 
+
+
         outboxRepository.touchBatch(batch.stream().map(Outbox::getUuid).toList());
 
         return batch;

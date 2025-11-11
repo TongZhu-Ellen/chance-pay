@@ -29,7 +29,7 @@ public interface OutboxRepository extends JpaRepository<Outbox, String> {
                last_touched_at = CURRENT_TIMESTAMP
          WHERE uuid IN (:uuids)
         """, nativeQuery = true)
-    int touchBatch(@Param("uuids") List<String> uuids);
+    public int touchBatch(@Param("uuids") List<String> uuids);
 
 
 }

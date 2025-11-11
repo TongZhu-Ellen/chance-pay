@@ -1,5 +1,6 @@
 package com.tongzhu.chancepay.orchestrator.outbox;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -16,10 +17,12 @@ public class OutboxScanner {
 
     private final OutboxService outboxService;
     private final OutboxPublisher outboxPublisher;
+    private final JdbcTemplate jdbcTemplate;
 
-    public OutboxScanner(OutboxService outboxService, OutboxPublisher outboxPublisher) {
+    public OutboxScanner(OutboxService outboxService, OutboxPublisher outboxPublisher, JdbcTemplate jdbcTemplate) {
         this.outboxService = outboxService;
         this.outboxPublisher = outboxPublisher;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
 
@@ -28,8 +31,7 @@ public class OutboxScanner {
 
         List<Outbox> batch = outboxService.selectTouched(OUTBOX_PER_SELECT, BACKOFF_IN_SECOND);
 
-        for (Outbox outbox : batch) {
-            outboxPublisher.publish(outbox);
+        for (Outbox outbox : batch) outboxPublisher.publish(outbox);
 
             /*
             I intentionally didn't do a try-catch here!
@@ -38,7 +40,12 @@ public class OutboxScanner {
 
              */
 
-        }
+
+        int pending = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM outbox", Integer.class);
+        System.out.println(pending + " "); // this is on printing num of outboxes!!!
+
+
+
 
 
 
